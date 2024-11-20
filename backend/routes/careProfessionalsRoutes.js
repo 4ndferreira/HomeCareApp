@@ -86,7 +86,7 @@ router.get("/:id", Controller.getCareProfessionalById);
  *               professionalBiography:
  *                 type: string
  *               idUser:
- *                 type: integer  # Corrigido para 'integer'
+ *                 type: integer
  *             required:
  *               - professionalRegistryCode
  *               - professionalBiography

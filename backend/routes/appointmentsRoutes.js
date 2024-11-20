@@ -173,7 +173,6 @@ router.put("/:id", appointmentController.updateAppointment);
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID do agendamento
  *         schema:
  *           type: integer
  *     responses:
