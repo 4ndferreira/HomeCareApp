@@ -1,5 +1,5 @@
 import { DataSource, Repository } from "typeorm";
-import { User } from "../models/entities/User";
+import { User } from "../models/user/entities/User";
 
 export class UserRepository {
   private repo: Repository<User>;
@@ -14,6 +14,10 @@ export class UserRepository {
 
   findById(id: number) {
     return this.repo.findOneBy({ idUser: id });
+  }
+ 
+  findByFirebaseUid(uid: string) {
+    return this.repo.findOneBy({ firebaseUid: uid });
   }
 
   create(userData: Partial<User>) {

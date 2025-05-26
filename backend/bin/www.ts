@@ -1,3 +1,13 @@
+process.on('uncaughtException', (error) => {
+  console.error('❌ Erro não tratado (uncaughtException):', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 Rejeição não tratada em Promise:', promise, 'Motivo:', reason);
+  process.exit(1);
+});
+
 import { createServer } from 'http';
 import debugLib from 'debug';
 import app from '../src/app';
@@ -8,7 +18,7 @@ const debug = debugLib('backend:server');
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '5000');
 app.set('port', port);
 
 /**
@@ -16,7 +26,7 @@ app.set('port', port);
  */
 AppDataSource.initialize()
   .then(() => {
-    console.log('Data Source initialized');
+    console.log('✅ Data Source initialized');
 
     /**
      * Create HTTP server.
@@ -36,7 +46,7 @@ AppDataSource.initialize()
     function onListening(): void {
       const addr = server.address();
       const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr?.port}`;
-      debug(`Listening on ${bind}`);
+      debug(`🚀 Listening on ${bind}`);
     }
 
     /**
@@ -65,7 +75,7 @@ AppDataSource.initialize()
 
   })
   .catch((err) => {
-    console.error('Error during Data Source initialization:', err);
+    console.error('💥 Error during Data Source initialization:', err);
     process.exit(1);
   });
 

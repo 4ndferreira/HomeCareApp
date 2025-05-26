@@ -1,83 +1,124 @@
-import { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../database/data-source";
-import { AppointmentRepository } from "../repositories/AppointmentRepository";
+import { Controller, Route, Tags, Get, Post, Put, Delete, Path, Body, SuccessResponse, Response as TsoaResponse, Query } from "tsoa";
 import { AppointmentService } from "../services/AppointmentService";
+import { AppointmentRepository } from "../repositories/AppointmentRepository";
+import { AppDataSource } from "../database/data-source";
 import { CareProfessionalRepository } from "../repositories/CareProfessionalRepository";
-import { CareProfessionalService } from "../services/CareProfessionalService";
 import { PatientRepository } from "../repositories/PatientRepository";
-import { PatientService } from "../services/PatientService";
+import { AddressRepository } from "../repositories/AddressRepository";
+import { GetAppointmentResponse } from "../models/appointment/dtos/GetAppointmentResponse";
+import { PostAppointmentRequest } from "../models/appointment/dtos/PostAppointmentRequest";
+import { CreateResponse } from "../models/shared/CreateResponse";
+import { PutAppointmentRequest } from "../models/appointment/dtos/PutAppointmentRequest";
+import { UserRepository } from "../repositories/UserRepository";
+
 
 const appointmentRepository = new AppointmentRepository(AppDataSource);
-const appointmentService = new AppointmentService(appointmentRepository);
-const careProfessionalRepository = new CareProfessionalRepository(AppDataSource);
-const careProfessionalService = new CareProfessionalService(careProfessionalRepository);
+const addressRepository = new AddressRepository(AppDataSource);
 const patientRepository = new PatientRepository(AppDataSource);
-const patientService = new PatientService(patientRepository);
+const careProfessionalRepository = new CareProfessionalRepository(
+  AppDataSource
+);
+const userRepository = new UserRepository(AppDataSource);
 
-export const getAllAppointments = async (req: Request, res : Response, next: NextFunction) => {
-  try {
-    const appointments = await appointmentService.getAllAppointments();
-    res.json(appointments);
-  } catch (err) {
-    next(err);
-  }
-};
+const appointmentService = new AppointmentService(
+  appointmentRepository,
+  addressRepository,
+  patientRepository,
+  careProfessionalRepository,
+  userRepository
+);
 
-export const getAppointmentById = async (req: Request, res : Response, next: NextFunction) => {
-  try {
-    const appointment = await appointmentService.getAppointmentById(Number(req.params.id));
-    if (appointment) {
-      res.json(appointment);
-    } else {
-      res.status(404).send("Appointment not found");
-    }
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const createAppointment = async (req: Request, res : Response, next: NextFunction) : Promise<void> => {
-  try {
-    const careProfessionalExists = await careProfessionalService.getCareProfessionalById(
-      req.body.idCareProfessional
+@Route("appointments")
+@Tags("Appointments")
+export class AppointmentController extends Controller {
+  /**
+   * @summary Busca por todos os agendamentos da base
+   * @returns Lista de todos os agendamentos
+   */
+  @Get("/")
+  public async getAllAppointments(
+    @Query() idCareProfessional?: number,
+    @Query() idPatient?: number
+  ): Promise<GetAppointmentResponse[]> {
+    if (idCareProfessional && idPatient)
+      throw new Error("Only one filter should be used per consultation.");
+    
+    const response = await appointmentService.getAllAppointments(
+      idCareProfessional,
+      idPatient
     );
-    if (!careProfessionalExists) {
-      res.status(404).json({ error: "Care professional not found" });
-    }
-    const patientExists = await patientService.getPatientById(req.body.idPatient);
-    if (!patientExists) {
-      res.status(404).json({ error: "Patient not found" });
-    }
-    const appointment = await appointmentService.createAppointments(req.body);
-    res.status(201).json(appointment);
-  } catch (err) {
-    next(err);
+    return response;
   }
-};
+  /**
+   * @summary Busca por um agendamento pelo seu ID
+   * @returns Exibe os dados do agendamento
+   */
+  @Get("/{id}")
+  @TsoaResponse<null>(404, "Appointment not found")
+  public async getAppointmentById(
+    @Path() id: number
+  ): Promise<GetAppointmentResponse> {
+    if (isNaN(id)) {
+      this.setStatus(400);
+      throw new Error(`Invalid appointment id: ${id}`);
+    }
+    const appointment = await appointmentService.getAppointmentById(id);
+    if (!appointment) {
+      this.setStatus(404);
+      throw new Error("Appointment not found");
+    }
+    return appointment;
+  }
+  /**
+   * @summary Cria um novo agendamento
+   * @returns Retorna o ID do agendamento criado
+   */
+  @SuccessResponse("201", "Created")
+  @Post("/")
+  public async createAppointment(
+    @Body() body: PostAppointmentRequest
+  ): Promise<CreateResponse> {
+    const appointment = await appointmentService.createAppointments(body);
+    this.setStatus(201);
+    return { id: appointment.idAppointment };
+  }
+  /**
+   * @summary Atualiza um agendamento pelo ID
+   */
+  @SuccessResponse("204", "No Content")
+  @Put("{id}")
+  public async updateAppointment(
+    @Path() id: number,
+    @Body() body: PutAppointmentRequest
+  ): Promise<void> {
+    if (isNaN(id)) {
+      this.setStatus(400);
+      throw new Error(`Invalid appointment id: ${id}`);
+    }
 
-export const updateAppointment = async (req: Request, res : Response, next: NextFunction) => {
-  try {
-    const updated = await appointmentService.updateAppointments(Number(req.params.id), req.body);
-    if (updated) {
-      const updateAppointment = await appointmentService.getAppointmentById(Number(req.params.id));
-      res.status(200).json(updateAppointment);
-    } else {
-      res.status(404).send("Appointment not found");
+    const updated = await appointmentService.updateAppointments(id, body);
+    if (!updated) {
+      this.setStatus(404);
+      throw new Error("Appointment not found");
     }
-  } catch (err) {
-    next(err);
+    this.setStatus(204);
   }
-};
+  /**
+   * @summary Remove um agendamento da base
+   */
+  @SuccessResponse("204", "No Content")
+  @Delete("{id}")
+  public async deleteAppointment(@Path() id: number): Promise<void> {
+    if (isNaN(id)) {
+      this.setStatus(400);
+      throw new Error(`Invalid user id: ${id}`);
+    }
 
-export const deleteAppointment = async (req: Request, res : Response, next: NextFunction) => {
-  try {
-    const deleted = await appointmentService.deleteAppointments(Number(req.params.id));
-    if (deleted) {
-      res.status(204).send();
-    } else {
-      res.status(404).send("Appointment not found");
+    const deleted = await appointmentService.deleteAppointments(id);
+    if (!deleted) {
+      this.setStatus(404);
+      throw new Error("Appointment not found");
     }
-  } catch (err) {
-    next(err);
+    this.setStatus(204);
   }
-};
+}

@@ -1,5 +1,5 @@
 import { DataSource, Repository } from "typeorm";
-import { CareProfessional } from "../models/entities/CareProfessional";
+import { CareProfessional } from "../models/careProfessional/entities/CareProfessional";
 
 export class CareProfessionalRepository {
   private repo: Repository<CareProfessional>
@@ -14,6 +14,10 @@ export class CareProfessionalRepository {
 
   findById(id: number) {
     return this.repo.findOneBy({ idCareProfessional : id })
+  }
+
+  findByUserId(idUser: number) {
+    return this.repo.findOneBy({ idUser: idUser });
   }
 
   create(careProfessionalData: Partial<CareProfessional>) {

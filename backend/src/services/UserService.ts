@@ -1,5 +1,5 @@
 import { UserRepository } from "../repositories/UserRepository";
-import { User } from "../models/entities/User";
+import { User } from "../models/user/entities/User";
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -12,8 +12,19 @@ export class UserService {
     return this.userRepository.findById(id);
   }
 
-  createUser(userData: Partial<User>) {
-    return this.userRepository.create(userData);
+  getByFirebaseUid(uid: string) {
+    return this.userRepository.findByFirebaseUid(uid);
+  }
+
+  async createUser(firebaseUid: string, userData: Partial<User>) {
+    const existingUser = await this.userRepository.findByFirebaseUid(firebaseUid);
+    if (existingUser) throw new Error("User already registered.");
+
+    const userToCreate = {
+      ...userData,
+      firebaseUid
+    };
+    return this.userRepository.create(userToCreate);
   }
 
   updateUser(id: number, userData: Partial<User>) {
