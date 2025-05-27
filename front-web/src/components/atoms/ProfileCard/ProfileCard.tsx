@@ -11,6 +11,7 @@ interface ProfileCardProps {
   idUser: number;
   name: string;
   experience: string;
+  image?: string;
 }
 
 interface UserDetails {
@@ -18,22 +19,24 @@ interface UserDetails {
   email: string;
   phoneNumber: string;
   description: string;
+  urlImage: string;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
   idUser,
   name,
   experience,
+  image
 }) => {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  const URL = "https://ads-senac-pi-grupo-04-quarto-semestre.onrender.com/api";
+  const URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   const fetchDetails = async () => {
     try {
       const response = await axios.get(`${URL}/users/${idUser}`);
-      setUserDetails(response.data);
+      setUserDetails(response.data);      
       setShowDetails(true);
     } catch (error) {
       console.error("Erro ao buscar detalhes do usuário:", error);
@@ -52,10 +55,16 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         onClick={fetchDetails}
       >
         <div className="w-full h-3/4 bg-gray-200 flex items-center justify-center">
-          <span className="text-gray-600 text-lg">Imagem 1</span>
+          <Image
+            priority
+            src={image || userIcon}
+            width={200}
+            height={200}
+            alt="User icon"
+            className="max-h-full max-w-full" />
         </div>
         <span className="p-4">
-          <p className="text-lg font-bold">{name}</p>
+          <p className="text-lg font-bold text-nowrap">{name}</p>
           <p className="text-sm text-gray-600">{experience}</p>
         </span>
       </div>
@@ -103,7 +112,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 </div>
               </div>
               <p className="text-sm text-gray-600">
-                Profissional muito atenciosa e dedicada.
+                Excelente profissional!
               </p>
             </div>
 
@@ -118,9 +127,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               </p>
             </div>
 
-            <Link href="/pages/appointments-page">
+            <Link href="/my-schedules">
             <button
-              className="mt-4 bg-black text-white px-6 py-2 rounded w-full"
+              className="mt-4 bg-[#348a89] hover:bg-[#2c7472] transition-colors duration-300 text-white px-6 py-2 rounded w-full"
               type="button"
             >
               Agendar
