@@ -10,7 +10,7 @@ jobs:
       uses: actions/checkout@v4
     - name: build image
       run: | 
-        docker build ./backend-api/ -t 4ndsilva/home-care-api:latest .
+        docker build ./backend-api/ -t 4ndsilva/home-care-api:latest
     - name: push image to docker hub
       run: |
         docker push docker push 4ndsilva/home-care-backend-api:latest
