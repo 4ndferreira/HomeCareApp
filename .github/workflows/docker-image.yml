@@ -6,9 +6,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: build image
       run: | 
         docker build -t 4ndsilva/home-care-api:latest .
-    - name: |
+    - name: push image to docker hub
+      run: |
         docker push docker push 4ndsilva/home-care-backend-api
