@@ -1,0 +1,14 @@
+name: Build and Publish image to Docker Hub
+on:
+  [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: | 
+        docker build -t 4ndsilva/home-care-api:latest .
+    - name: |
+        docker push docker push 4ndsilva/home-care-backend-api
