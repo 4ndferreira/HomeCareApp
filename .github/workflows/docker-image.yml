@@ -8,6 +8,11 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4
+    - name: OWASP Dependency-Check
+      uses: dependency-check/dependency-check-action@v2
+      with:
+       project: 'Nome do seu projeto'
+       scan: './backend/'
     - name: build image
       run: | 
         docker build ./backend/ -t 4ndsilva/home-care-backend-api:latest
