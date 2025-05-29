@@ -13,4 +13,5 @@ jobs:
         docker build ./backend/ -t 4ndsilva/home-care-backend-api:latest
     - name: push image to docker hub
       run: |
+        docker login -u 4ndsilva -p ${{ secrets.DOCKER_HUB_TOKEN }}
         docker push 4ndsilva/home-care-backend-api:latest
