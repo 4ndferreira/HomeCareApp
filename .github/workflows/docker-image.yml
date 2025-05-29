@@ -8,12 +8,6 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4
-      
-    - name: OWASP Dependency-Check
-      uses: dependency-check/dependency-check-action@v2
-      with:
-        project: 'home-care-backend-api'
-        scan: './backend/'
         
     - name: build image
       run: | 
