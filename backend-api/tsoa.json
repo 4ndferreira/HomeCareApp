@@ -16,6 +16,7 @@
     }
   },
   "routes": {
+    "iocModule": "./src/lib/tsyringeTsoaIocContainer",
     "routesDir": ".build",
     "authenticationModule": "./src/middlewares/firebaseAuth.ts"
   }

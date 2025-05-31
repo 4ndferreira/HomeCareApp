@@ -1,6 +1,6 @@
 import { ValidateError } from "tsoa";
 import { Request, Response, NextFunction } from "express";
-import { NotFoundError } from "../errors/NotFoundError";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 export function customErrorHandler(
   err: unknown,

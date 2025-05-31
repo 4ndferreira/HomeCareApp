@@ -1,12 +1,11 @@
 export interface GetPatientResponse {
   id: number;
-  idUser: number;
-  patientName: string;
-  patientCpf: string;
-  patientBirthDate: Date;
+  name: string;
+  cpf: string;
+  birthDate: Date;
   user: {
     id: number;
     name: string;
-    urlImage: string
+    urlImage?: string | null;
   }
 }

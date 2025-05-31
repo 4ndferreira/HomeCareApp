@@ -2,16 +2,26 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true, // Certifique-se de que o ambiente Node.js está habilitado
+    node: true,
   },
-  extends: 'eslint:recommended',
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+  ],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
-    ecmaVersion: 12,
-    sourceType: 'module',
+    ecmaVersion: 'latest',
+    sourceType: "module",
+    project: true
   },
+  plugins: [
+    "@typescript-eslint",
+    "import",
+  ],
   rules: {
-    // Suas regras personalizadas aqui
-    'no-unused-vars': 'warn',
-    'no-console': 'off',
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-console": "off",
   },
 };

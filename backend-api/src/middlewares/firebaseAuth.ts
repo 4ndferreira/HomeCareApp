@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import admin from '../firebase/configSnippet';
+import admin from '../firebase/configSnippet.js';
 
 export async function expressAuthentication(
   req: Request,

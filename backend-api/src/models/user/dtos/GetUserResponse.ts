@@ -1,9 +1,9 @@
 export interface GetUserResponse {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phoneNumber: string;
   cpf: string;
-  urlImage: string;
+  urlImage?: string | null;
   isPatient: boolean
 }

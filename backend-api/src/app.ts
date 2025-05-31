@@ -9,10 +9,10 @@ import express, {
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import cors from "cors";
-import { RegisterRoutes } from "../.build/routes";
+import { RegisterRoutes } from "../.build/routes.js";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "../.build/swagger.json" /*with { type: "json" }*/;
-import { customErrorHandler } from "./middlewares/customErrorHandler";
+import swaggerDocument from "../.build/swagger.json" with { type: "json" };
+import { customErrorHandler } from "./middlewares/customErrorHandler.js";
 import { ErrorRequestHandler } from "express";
 
 const app = express();

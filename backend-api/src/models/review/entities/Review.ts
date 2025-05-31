@@ -1,29 +1,29 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Patient } from "../../patient/entities/Patient";
-import { CareProfessional } from "../../careProfessional/entities/CareProfessional";
+import { Patient } from "../../patient/entities/Patient.js";
+import { Caregiver } from "../../caregiver/entities/Caregiver.js";
 
-@Entity({ name: "Reviews", schema: "public" })
+@Entity({ name: "REVIEWS", schema: "public" })
 export class Review {
-  @PrimaryGeneratedColumn()
-  idReview!: number;
-  @Column({ type: "int", nullable: false })
+  @PrimaryGeneratedColumn({ name: "ID" })
+  id!: number;
+  @Column({ name: "RATING", type: "int", nullable: false })
   rating!: number;
-  @Column({ type: "varchar", length: 250, nullable: true })
+  @Column({ name: "COMMENT", type: "varchar", length: 250, nullable: true })
   comment?: string;
-  @Column({ type: "varchar" })
+  @Column({ name: "ID_PATIENT", type: "varchar" })
   idPatient!: number;
-  @Column({ type: "varchar" })
-  idCareProfessional!: number;
-  @CreateDateColumn()
+  @Column({ name: "ID_CAREGIVER", type: "varchar" })
+  idCaregiver!: number;
+  @CreateDateColumn({name: "CREATED_AT"})
   createdAt!: Date;
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "UPDATED_AT" })
   updatedAt!: Date;
 
   @ManyToOne(() => Patient)
-  @JoinColumn({ name: "idPatient" })
+  @JoinColumn({ name: "ID_PATIENT" })
   patient!: Patient;
 
-  @ManyToOne(() => CareProfessional)
-  @JoinColumn({ name: "idCareProfessional" })
-  careProfessional!: CareProfessional;
+  @ManyToOne(() => Caregiver)
+  @JoinColumn({ name: "ID_CAREGIVER" })
+  caregiver!: Caregiver;
 }

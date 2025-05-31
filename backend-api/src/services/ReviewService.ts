@@ -1,46 +1,41 @@
-import { ReviewRepository } from "../repositories/ReviewRepository";
-import { PatientRepository } from "../repositories/PatientRepository";
-import { UserRepository } from "../repositories/UserRepository";
-import { Review } from "../models/review/entities/Review";
-import { DetailedReview } from "../models/review/dtos/DetailedReview";
-import { NotFoundError } from "../errors/NotFoundError";
+import { ReviewRepository } from "../repositories/ReviewRepository.js";
+import { PatientRepository } from "../repositories/PatientRepository.js";
+import { Review } from "../models/review/entities/Review.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
+import { GetReviewResponse } from "../models/review/dtos/GetReviewResponse.js";
+import toGetReviewResponse from "../models/review/mappers/ToGetReviewResponse.js";
+import { singleton } from "tsyringe";
 
+@singleton()
 export class ReviewService {
   constructor(
     private repository: ReviewRepository,
-    private patientRepository: PatientRepository,
-    private userRepository: UserRepository
+    private patientRepository: PatientRepository
   ) {}
 
   async getAll(
-    idCareProfessional: number | undefined,
+    idCaregiver: number | undefined,
     idPatient: number | undefined
-  ): Promise<DetailedReview[]> {
+  ): Promise<GetReviewResponse[]> {
     const where: any = {};
-    if (idCareProfessional) where.idCareProfessional = idCareProfessional;
+    if (idCaregiver) where.idCaregiver = idCaregiver;
     if (idPatient) where.idPatient = idPatient;
 
-    const reviews = await this.repository.findAll({ where });
+    const reviews = await this.repository.findAll({
+      where,
+      relations: { patient: { user: true } },
+    });
 
     const detailedReviews = await Promise.all(
       reviews.map(async (review) => {
+        const idPatient = review.idPatient;
         try {
-          const patient = await this.patientRepository.findById(
-            review.idPatient
-          );
+          const patient = await this.patientRepository.findOne({
+            where: { id: idPatient },
+          });
           if (!patient) throw new Error("Patient not found");
 
-          const user = await this.userRepository.findById(patient.idUser);
-          if (!user) throw new Error("User not found");
-
-          return {
-            ...review,
-            patient: {
-              id: patient.idPatient,
-              name: user.name,
-              urlImage: user.urlImage,
-            },
-          } as DetailedReview
+          return toGetReviewResponse(review);
         } catch (e) {
           console.error("Error processing review:", e);
           return null;
@@ -48,27 +43,17 @@ export class ReviewService {
       })
     );
 
-    return detailedReviews.filter((r): r is DetailedReview => r !== null);
+    return detailedReviews.filter((r): r is GetReviewResponse => r !== null);
   }
 
-  async getById(id: number): Promise<DetailedReview | null> {
-    const review = await this.repository.findById(id);
+  async getById(id: number): Promise<GetReviewResponse | null> {
+    const review = await this.repository.findOne({
+      where: { id },
+      relations: { patient: true },
+    });
     if (!review) throw new NotFoundError("Review not found");
 
-    const patient = await this.patientRepository.findById(review.idPatient);
-    if (!patient) throw new NotFoundError("Patient not found");
-    
-    const user = await this.userRepository.findById(patient.idUser);
-    if (!user) throw new NotFoundError("User not found");
-
-    return {
-      ...review,
-      patient: {
-        id: patient.idPatient,
-        name: user.name,
-        urlImage: user.urlImage,
-      },
-    } as DetailedReview;
+    return toGetReviewResponse(review);
   }
 
   async create(reviewData: Partial<Review>): Promise<Review> {

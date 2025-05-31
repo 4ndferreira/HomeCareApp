@@ -4,19 +4,21 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { UserController } from './../src/controllers/UserController';
+import { UserController } from './../src/controllers/UserController.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { ReviewController } from './../src/controllers/ReviewController';
+import { ReviewController } from './../src/controllers/ReviewController.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { PatientController } from './../src/controllers/patientController';
+import { PatientController } from './../src/controllers/patientController.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { CareProfessionalController } from './../src/controllers/careProfessionalController';
+import { CaregiverController } from './../src/controllers/caregiverController.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { AppointmentController } from './../src/controllers/appointmentController';
+import { AppointmentController } from './../src/controllers/appointmentController.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { AddressController } from './../src/controllers/AddressController';
-import { expressAuthentication } from './../src/middlewares/firebaseAuth';
+import { AddressController } from './../src/controllers/AddressController.js';
+import { expressAuthentication } from './../src/middlewares/firebaseAuth.js';
 // @ts-ignore - no great way to install types from subpackage
+import { iocContainer } from './../src/lib/tsyringeTsoaIocContainer.js';
+import type { IocContainer, IocContainerFactory } from '@tsoa/runtime';
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 
 const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, securityName: string, scopes?: string[], res?: ExResponse) => Promise<any>;
@@ -28,12 +30,12 @@ const models: TsoaRoute.Models = {
     "GetUserResponse": {
         "dataType": "refObject",
         "properties": {
-            "id": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
             "name": {"dataType":"string","required":true},
             "email": {"dataType":"string","required":true},
             "phoneNumber": {"dataType":"string","required":true},
             "cpf": {"dataType":"string","required":true},
-            "urlImage": {"dataType":"string","required":true},
+            "urlImage": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
             "isPatient": {"dataType":"boolean","required":true},
         },
         "additionalProperties": false,
@@ -65,8 +67,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"double","required":true},
             "rating": {"dataType":"double","required":true},
-            "comment": {"dataType":"string","required":true},
-            "idCareProfessional": {"dataType":"double","required":true},
+            "comment": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
+            "idCaregiver": {"dataType":"double","required":true},
             "patient": {"dataType":"nestedObjectLiteral","nestedProperties":{"urlImage":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
         },
         "additionalProperties": false,
@@ -77,7 +79,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "rating": {"dataType":"double","required":true},
             "comment": {"dataType":"string","required":true},
-            "idCareProfessional": {"dataType":"double","required":true},
+            "idCaregiver": {"dataType":"double","required":true},
             "idPatient": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
@@ -87,11 +89,10 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double","required":true},
-            "idUser": {"dataType":"double","required":true},
-            "patientName": {"dataType":"string","required":true},
-            "patientCpf": {"dataType":"string","required":true},
-            "patientBirthDate": {"dataType":"datetime","required":true},
-            "user": {"dataType":"nestedObjectLiteral","nestedProperties":{"urlImage":{"dataType":"string","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
+            "name": {"dataType":"string","required":true},
+            "cpf": {"dataType":"string","required":true},
+            "birthDate": {"dataType":"datetime","required":true},
+            "user": {"dataType":"nestedObjectLiteral","nestedProperties":{"urlImage":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -100,31 +101,31 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "idUser": {"dataType":"double","required":true},
-            "patientName": {"dataType":"string","required":true},
-            "patientCpf": {"dataType":"string","required":true},
-            "patientBirthDate": {"dataType":"datetime","required":true},
+            "name": {"dataType":"string","required":true},
+            "cpf": {"dataType":"string","required":true},
+            "birthDate": {"dataType":"datetime","required":true},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetCareProfessionalResponse": {
+    "GetCaregiverResponse": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double","required":true},
-            "professionalRegistryCode": {"dataType":"string","required":true},
-            "professionalBiography": {"dataType":"string","required":true},
+            "corenNumber": {"dataType":"string","required":true},
+            "biography": {"dataType":"string","required":true},
             "rating": {"dataType":"double"},
             "user": {"dataType":"nestedObjectLiteral","nestedProperties":{"urlImage":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "CareProfessionalRequest": {
+    "CaregiverRequest": {
         "dataType": "refObject",
         "properties": {
             "idUser": {"dataType":"double","required":true},
-            "professionalRegistryCode": {"dataType":"string","required":true},
-            "professionalBiography": {"dataType":"string","required":true},
+            "corenNumber": {"dataType":"string","required":true},
+            "biography": {"dataType":"string","required":true},
             "rating": {"dataType":"double"},
         },
         "additionalProperties": false,
@@ -141,9 +142,9 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double","required":true},
             "scheduledAt": {"dataType":"datetime","required":true},
             "status": {"ref":"AppointmentStatus","required":true},
-            "patient": {"dataType":"nestedObjectLiteral","nestedProperties":{"phoneNumber":{"dataType":"string","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
-            "careProfessional": {"dataType":"nestedObjectLiteral","nestedProperties":{"phoneNumber":{"dataType":"string","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
-            "address": {"dataType":"nestedObjectLiteral","nestedProperties":{"country":{"dataType":"string","required":true},"postalCode":{"dataType":"string","required":true},"state":{"dataType":"string","required":true},"city":{"dataType":"string","required":true},"neighborhood":{"dataType":"string","required":true},"complement":{"dataType":"string"},"number":{"dataType":"string","required":true},"street":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
+            "patient": {"dataType":"nestedObjectLiteral","nestedProperties":{"phoneNumber":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"required":true},
+            "caregiver": {"dataType":"nestedObjectLiteral","nestedProperties":{"phoneNumber":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"required":true},
+            "address": {"dataType":"nestedObjectLiteral","nestedProperties":{"alias":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -153,7 +154,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "scheduledAt": {"dataType":"datetime","required":true},
             "idPatient": {"dataType":"double","required":true},
-            "idCareProfessional": {"dataType":"double","required":true},
+            "idCaregiver": {"dataType":"double","required":true},
             "idAddress": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
@@ -175,7 +176,7 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double","required":true},
             "street": {"dataType":"string","required":true},
             "number": {"dataType":"string","required":true},
-            "complement": {"dataType":"string"},
+            "complement": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
             "neighborhood": {"dataType":"string","required":true},
             "city": {"dataType":"string","required":true},
             "state": {"dataType":"string","required":true},
@@ -231,7 +232,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getAllUsers, request, response });
 
-                const controller = new UserController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAllUsers',
@@ -261,7 +267,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getUserById, request, response });
 
-                const controller = new UserController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getUserById',
@@ -279,7 +290,7 @@ export function RegisterRoutes(app: Router) {
         const argsUserController_getUserByFirebaseUid: Record<string, TsoaRoute.ParameterSchema> = {
                 req: {"in":"request","name":"req","required":true,"dataType":"object"},
         };
-        app.get('/users/firebase',
+        app.get('/users/firebase-user',
             authenticateMiddleware([{"firebase":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUserByFirebaseUid)),
@@ -292,7 +303,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getUserByFirebaseUid, request, response });
 
-                const controller = new UserController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getUserByFirebaseUid',
@@ -324,7 +340,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsUserController_createUser, request, response });
 
-                const controller = new UserController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'createUser',
@@ -344,6 +365,7 @@ export function RegisterRoutes(app: Router) {
                 userData: {"in":"body","name":"userData","required":true,"ref":"UserRequest"},
         };
         app.put('/users/:id',
+            authenticateMiddleware([{"firebase":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.updateUser)),
 
@@ -355,7 +377,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsUserController_updateUser, request, response });
 
-                const controller = new UserController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'updateUser',
@@ -374,6 +401,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.delete('/users/:id',
+            authenticateMiddleware([{"firebase":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser)),
 
@@ -385,7 +413,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsUserController_deleteUser, request, response });
 
-                const controller = new UserController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'deleteUser',
@@ -401,7 +434,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsReviewController_getAll: Record<string, TsoaRoute.ParameterSchema> = {
-                idCareProfessional: {"in":"query","name":"idCareProfessional","dataType":"double"},
+                idCaregiver: {"in":"query","name":"idCaregiver","dataType":"double"},
                 idPatient: {"in":"query","name":"idPatient","dataType":"double"},
         };
         app.get('/reviews',
@@ -416,7 +449,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsReviewController_getAll, request, response });
 
-                const controller = new ReviewController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<ReviewController>(ReviewController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAll',
@@ -446,7 +484,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsReviewController_getById, request, response });
 
-                const controller = new ReviewController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<ReviewController>(ReviewController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getById',
@@ -476,7 +519,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsReviewController_create, request, response });
 
-                const controller = new ReviewController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<ReviewController>(ReviewController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'create',
@@ -507,7 +555,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsReviewController_update, request, response });
 
-                const controller = new ReviewController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<ReviewController>(ReviewController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'update',
@@ -537,7 +590,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsReviewController_remove, request, response });
 
-                const controller = new ReviewController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<ReviewController>(ReviewController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'remove',
@@ -566,7 +624,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsPatientController_getAllPatients, request, response });
 
-                const controller = new PatientController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<PatientController>(PatientController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAllPatients',
@@ -596,7 +659,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsPatientController_getPatientById, request, response });
 
-                const controller = new PatientController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<PatientController>(PatientController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getPatientById',
@@ -626,7 +694,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsPatientController_getPatientByUserId, request, response });
 
-                const controller = new PatientController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<PatientController>(PatientController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getPatientByUserId',
@@ -656,7 +729,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsPatientController_createPatient, request, response });
 
-                const controller = new PatientController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<PatientController>(PatientController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'createPatient',
@@ -687,7 +765,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsPatientController_updatePatient, request, response });
 
-                const controller = new PatientController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<PatientController>(PatientController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'updatePatient',
@@ -702,51 +785,26 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsPatientController_deletePatient: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
-        };
-        app.delete('/patients/:id',
-            ...(fetchMiddlewares<RequestHandler>(PatientController)),
-            ...(fetchMiddlewares<RequestHandler>(PatientController.prototype.deletePatient)),
-
-            async function PatientController_deletePatient(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPatientController_deletePatient, request, response });
-
-                const controller = new PatientController();
-
-              await templateService.apiHandler({
-                methodName: 'deletePatient',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCareProfessionalController_getAllCareProfessinals: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsCaregiverController_getAllCareProfessinals: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/care-professionals',
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController)),
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController.prototype.getAllCareProfessinals)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController.prototype.getAllCareProfessinals)),
 
-            async function CareProfessionalController_getAllCareProfessinals(request: ExRequest, response: ExResponse, next: any) {
+            async function CaregiverController_getAllCareProfessinals(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCareProfessionalController_getAllCareProfessinals, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsCaregiverController_getAllCareProfessinals, request, response });
 
-                const controller = new CareProfessionalController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CaregiverController>(CaregiverController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAllCareProfessinals',
@@ -761,22 +819,27 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCareProfessionalController_getCareProfessinalById: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsCaregiverController_getCareProfessinalById: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.get('/care-professionals/:id',
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController)),
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController.prototype.getCareProfessinalById)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController.prototype.getCareProfessinalById)),
 
-            async function CareProfessionalController_getCareProfessinalById(request: ExRequest, response: ExResponse, next: any) {
+            async function CaregiverController_getCareProfessinalById(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCareProfessionalController_getCareProfessinalById, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsCaregiverController_getCareProfessinalById, request, response });
 
-                const controller = new CareProfessionalController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CaregiverController>(CaregiverController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getCareProfessinalById',
@@ -791,22 +854,27 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCareProfessionalController_getCareProfessinalByUserId: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsCaregiverController_getCareProfessinalByUserId: Record<string, TsoaRoute.ParameterSchema> = {
                 idUser: {"in":"path","name":"idUser","required":true,"dataType":"double"},
         };
         app.get('/care-professionals/user/:idUser',
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController)),
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController.prototype.getCareProfessinalByUserId)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController.prototype.getCareProfessinalByUserId)),
 
-            async function CareProfessionalController_getCareProfessinalByUserId(request: ExRequest, response: ExResponse, next: any) {
+            async function CaregiverController_getCareProfessinalByUserId(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCareProfessionalController_getCareProfessinalByUserId, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsCaregiverController_getCareProfessinalByUserId, request, response });
 
-                const controller = new CareProfessionalController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CaregiverController>(CaregiverController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getCareProfessinalByUserId',
@@ -821,22 +889,27 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCareProfessionalController_createCareProfessinal: Record<string, TsoaRoute.ParameterSchema> = {
-                careProfessionalData: {"in":"body","name":"careProfessionalData","required":true,"ref":"CareProfessionalRequest"},
+        const argsCaregiverController_createCareProfessinal: Record<string, TsoaRoute.ParameterSchema> = {
+                caregiverData: {"in":"body","name":"caregiverData","required":true,"ref":"CaregiverRequest"},
         };
         app.post('/care-professionals',
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController)),
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController.prototype.createCareProfessinal)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController.prototype.createCareProfessinal)),
 
-            async function CareProfessionalController_createCareProfessinal(request: ExRequest, response: ExResponse, next: any) {
+            async function CaregiverController_createCareProfessinal(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCareProfessionalController_createCareProfessinal, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsCaregiverController_createCareProfessinal, request, response });
 
-                const controller = new CareProfessionalController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CaregiverController>(CaregiverController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'createCareProfessinal',
@@ -851,23 +924,28 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCareProfessionalController_updateCareProfessinal: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsCaregiverController_updateCareProfessinal: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
-                careProfessionalData: {"in":"body","name":"careProfessionalData","required":true,"ref":"CareProfessionalRequest"},
+                caregiverData: {"in":"body","name":"caregiverData","required":true,"ref":"CaregiverRequest"},
         };
         app.put('/care-professionals/:id',
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController)),
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController.prototype.updateCareProfessinal)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController)),
+            ...(fetchMiddlewares<RequestHandler>(CaregiverController.prototype.updateCareProfessinal)),
 
-            async function CareProfessionalController_updateCareProfessinal(request: ExRequest, response: ExResponse, next: any) {
+            async function CaregiverController_updateCareProfessinal(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCareProfessionalController_updateCareProfessinal, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsCaregiverController_updateCareProfessinal, request, response });
 
-                const controller = new CareProfessionalController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CaregiverController>(CaregiverController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'updateCareProfessinal',
@@ -882,38 +960,8 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCareProfessionalController_deleteCareProfessinal: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
-        };
-        app.delete('/care-professionals/:id',
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController)),
-            ...(fetchMiddlewares<RequestHandler>(CareProfessionalController.prototype.deleteCareProfessinal)),
-
-            async function CareProfessionalController_deleteCareProfessinal(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCareProfessionalController_deleteCareProfessinal, request, response });
-
-                const controller = new CareProfessionalController();
-
-              await templateService.apiHandler({
-                methodName: 'deleteCareProfessinal',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAppointmentController_getAllAppointments: Record<string, TsoaRoute.ParameterSchema> = {
-                idCareProfessional: {"in":"query","name":"idCareProfessional","dataType":"double"},
+                idCaregiver: {"in":"query","name":"idCaregiver","dataType":"double"},
                 idPatient: {"in":"query","name":"idPatient","dataType":"double"},
         };
         app.get('/appointments',
@@ -928,7 +976,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAppointmentController_getAllAppointments, request, response });
 
-                const controller = new AppointmentController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AppointmentController>(AppointmentController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAllAppointments',
@@ -958,7 +1011,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAppointmentController_getAppointmentById, request, response });
 
-                const controller = new AppointmentController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AppointmentController>(AppointmentController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAppointmentById',
@@ -988,7 +1046,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAppointmentController_createAppointment, request, response });
 
-                const controller = new AppointmentController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AppointmentController>(AppointmentController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'createAppointment',
@@ -1019,7 +1082,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAppointmentController_updateAppointment, request, response });
 
-                const controller = new AppointmentController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AppointmentController>(AppointmentController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'updateAppointment',
@@ -1049,7 +1117,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAppointmentController_deleteAppointment, request, response });
 
-                const controller = new AppointmentController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AppointmentController>(AppointmentController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'deleteAppointment',
@@ -1078,7 +1151,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAddressController_getAllAddresses, request, response });
 
-                const controller = new AddressController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AddressController>(AddressController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAllAddresses',
@@ -1108,7 +1186,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAddressController_getAddressById, request, response });
 
-                const controller = new AddressController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AddressController>(AddressController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'getAddressById',
@@ -1138,7 +1221,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAddressController_createAddress, request, response });
 
-                const controller = new AddressController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AddressController>(AddressController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'createAddress',
@@ -1169,7 +1257,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAddressController_updateAddress, request, response });
 
-                const controller = new AddressController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AddressController>(AddressController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'updateAddress',
@@ -1199,7 +1292,12 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args: argsAddressController_removeAddress, request, response });
 
-                const controller = new AddressController();
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<AddressController>(AddressController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
 
               await templateService.apiHandler({
                 methodName: 'removeAddress',

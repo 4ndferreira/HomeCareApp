@@ -1,50 +1,30 @@
 import { Controller, Route, Tags, Get, Post, Put, Delete, Path, Body, SuccessResponse, Response as TsoaResponse, Query } from "tsoa";
-import { AppointmentService } from "../services/AppointmentService";
-import { AppointmentRepository } from "../repositories/AppointmentRepository";
-import { AppDataSource } from "../database/data-source";
-import { CareProfessionalRepository } from "../repositories/CareProfessionalRepository";
-import { PatientRepository } from "../repositories/PatientRepository";
-import { AddressRepository } from "../repositories/AddressRepository";
-import { GetAppointmentResponse } from "../models/appointment/dtos/GetAppointmentResponse";
-import { PostAppointmentRequest } from "../models/appointment/dtos/PostAppointmentRequest";
-import { CreateResponse } from "../models/shared/CreateResponse";
-import { PutAppointmentRequest } from "../models/appointment/dtos/PutAppointmentRequest";
-import { UserRepository } from "../repositories/UserRepository";
+import { AppointmentService } from "../services/AppointmentService.js";
+import { GetAppointmentResponse } from "../models/appointment/dtos/GetAppointmentResponse.js";
+import { PostAppointmentRequest } from "../models/appointment/dtos/PostAppointmentRequest.js";
+import { CreateResponse } from "../models/shared/CreateResponse.js";
+import { PutAppointmentRequest } from "../models/appointment/dtos/PutAppointmentRequest.js";
+import { injectable } from "tsyringe";
 
-
-const appointmentRepository = new AppointmentRepository(AppDataSource);
-const addressRepository = new AddressRepository(AppDataSource);
-const patientRepository = new PatientRepository(AppDataSource);
-const careProfessionalRepository = new CareProfessionalRepository(
-  AppDataSource
-);
-const userRepository = new UserRepository(AppDataSource);
-
-const appointmentService = new AppointmentService(
-  appointmentRepository,
-  addressRepository,
-  patientRepository,
-  careProfessionalRepository,
-  userRepository
-);
-
+@injectable()
 @Route("appointments")
 @Tags("Appointments")
 export class AppointmentController extends Controller {
+  constructor(private appointmentService: AppointmentService) { super() }
   /**
    * @summary Busca por todos os agendamentos da base
    * @returns Lista de todos os agendamentos
    */
   @Get("/")
   public async getAllAppointments(
-    @Query() idCareProfessional?: number,
+    @Query() idCaregiver?: number,
     @Query() idPatient?: number
   ): Promise<GetAppointmentResponse[]> {
-    if (idCareProfessional && idPatient)
+    if (idCaregiver && idPatient)
       throw new Error("Only one filter should be used per consultation.");
     
-    const response = await appointmentService.getAllAppointments(
-      idCareProfessional,
+    const response = await this.appointmentService.getAllAppointments(
+      idCaregiver,
       idPatient
     );
     return response;
@@ -62,7 +42,7 @@ export class AppointmentController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid appointment id: ${id}`);
     }
-    const appointment = await appointmentService.getAppointmentById(id);
+    const appointment = await this.appointmentService.getAppointmentById(id);
     if (!appointment) {
       this.setStatus(404);
       throw new Error("Appointment not found");
@@ -78,9 +58,9 @@ export class AppointmentController extends Controller {
   public async createAppointment(
     @Body() body: PostAppointmentRequest
   ): Promise<CreateResponse> {
-    const appointment = await appointmentService.createAppointments(body);
+    const appointment = await this.appointmentService.createAppointments(body);
     this.setStatus(201);
-    return { id: appointment.idAppointment };
+    return { id: appointment.id };
   }
   /**
    * @summary Atualiza um agendamento pelo ID
@@ -96,7 +76,7 @@ export class AppointmentController extends Controller {
       throw new Error(`Invalid appointment id: ${id}`);
     }
 
-    const updated = await appointmentService.updateAppointments(id, body);
+    const updated = await this.appointmentService.updateAppointments(id, body);
     if (!updated) {
       this.setStatus(404);
       throw new Error("Appointment not found");
@@ -114,7 +94,7 @@ export class AppointmentController extends Controller {
       throw new Error(`Invalid user id: ${id}`);
     }
 
-    const deleted = await appointmentService.deleteAppointments(id);
+    const deleted = await this.appointmentService.deleteAppointments(id);
     if (!deleted) {
       this.setStatus(404);
       throw new Error("Appointment not found");

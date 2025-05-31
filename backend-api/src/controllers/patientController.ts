@@ -1,34 +1,25 @@
 import { Body, Controller, Get, Path, Post, Put, Delete, Route, Tags } from "tsoa";
-import { PatientService } from "../services/PatientService";
-import { PatientRepository } from "../repositories/PatientRepository";
-import { AppDataSource } from "../database/data-source";
-import { UserRepository } from "../repositories/UserRepository";
-import { CareProfessionalRepository } from "../repositories/CareProfessionalRepository";
-import { GetPatientResponse } from "../models/patient/dtos/GetPatientResponse";
-import { PatientRequest } from "../models/patient/dtos/PatientRequest";
-import { CreateResponse } from "../models/shared/CreateResponse";
+import { PatientService } from "../services/PatientService.js";
+import { GetPatientResponse } from "../models/patient/dtos/GetPatientResponse.js";
+import { PatientRequest } from "../models/patient/dtos/PatientRequest.js";
+import { CreateResponse } from "../models/shared/CreateResponse.js";
+import { injectable } from "tsyringe";
+import { UserService } from "../services/UserService.js";
 
-const patientRepository = new PatientRepository(AppDataSource);
-const careProfessionalRepository = new CareProfessionalRepository(
-  AppDataSource
-);
-const userRepository = new UserRepository(AppDataSource);
-const patientService = new PatientService(
-  patientRepository,
-  careProfessionalRepository,
-  userRepository
-);
-
+@injectable()
 @Route("patients")
 @Tags("Patients")
 export class PatientController extends Controller {
+  constructor(
+    private patientService: PatientService, 
+    private userService: UserService) { super() }
   /**
    * @summary Busca a lista de todos os pacientes da base
    * @returns Lista de todos os pacientes e seus dados
    */
   @Get("/")
   public async getAllPatients(): Promise<GetPatientResponse[]> {
-    return await patientService.getAllPatients();
+    return await this.patientService.getAllPatients();
   }
   /**
    * @summary Busca um paciente específico pelo seu ID
@@ -40,7 +31,7 @@ export class PatientController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid patient id: ${id}`);
     }
-    const patient = await patientService.getPatientById(id);
+    const patient = await this.patientService.getPatientById(id);
     if (!patient) {
       this.setStatus(404);
       throw new Error("Patient not found");
@@ -57,7 +48,7 @@ export class PatientController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid user id: ${idUser}`);
     }
-    const patient = await patientService.getPatientByUserId(idUser);
+    const patient = await this.patientService.getPatientByUserId(idUser);
     if (!patient) {
       this.setStatus(404);
       throw new Error("Patient not found");
@@ -72,11 +63,15 @@ export class PatientController extends Controller {
   public async createPatient(
     @Body() patientData: PatientRequest
   ): Promise<CreateResponse> {
-    const patient = await patientService.createPatient(patientData);
-    if (!patient) throw new Error("Unable to create patient.");
+    const userExists = await this.userService.getUserById(
+      patientData.idUser
+    );
+    if(!userExists) throw new Error("User not found.");
+    
+    const patient = await this.patientService.createPatient(patientData);
 
     this.setStatus(201);
-    return { id: patient.idPatient };
+    return { id: patient.id };
   }
   /**
    * @summary Atualiza o cadastro de paciente na base
@@ -90,27 +85,10 @@ export class PatientController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid patient id: ${id}`);
     }
-    const updated = await patientService.updatePatient(id, patientData);
+    const updated = await this.patientService.updatePatient(id, patientData);
     if (!updated) {
       this.setStatus(404);
       throw new Error(`There is no patient associated with id ${id}.`);
-    }
-    this.setStatus(204);
-  }
-  /**
-   * @summary Remove o resgistro de um paciente da base
-   */
-  @Delete("/{id}")
-  public async deletePatient(@Path() id: number): Promise<void> {
-    if (isNaN(id)) {
-      this.setStatus(400);
-      throw new Error(`Invalid patient id: ${id}`);
-    }
-
-    const deleted = await patientService.deletePatient(id);
-    if (!deleted) {
-      this.setStatus(404);
-      throw new Error("Patient not found");
     }
     this.setStatus(204);
   }

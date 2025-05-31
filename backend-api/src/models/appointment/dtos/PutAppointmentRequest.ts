@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "../enums/AppointmentStatus"
+import { AppointmentStatus } from "../enums/AppointmentStatus.js"
 
 export interface PutAppointmentRequest {
   scheduledAt: Date,

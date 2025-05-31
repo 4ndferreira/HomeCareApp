@@ -1,0 +1,30 @@
+name: Build and Publish image to Docker Hub
+on:
+  push:
+    branches:
+      - pipeline/docker-build-publish
+    paths:
+      - 'backend/**'
+      - '.github/workflows/docker-image.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: login to docker hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+    - name: build docker image
+      run: | 
+        docker build ./backend/ -t 4ndsilva/home-care-backend-api:latest
+
+    - name: push image to docker hub
+      run: |
+        docker push 4ndsilva/home-care-backend-api:latest

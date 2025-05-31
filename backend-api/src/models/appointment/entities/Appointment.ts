@@ -1,44 +1,45 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { Patient } from "../../patient/entities/Patient";
-import { CareProfessional } from "../../careProfessional/entities/CareProfessional";
-import { AppointmentStatus } from "../enums/AppointmentStatus";
-import { Address } from "../../address/entities/Address";
+import { Patient } from "../../patient/entities/Patient.js";
+import { Caregiver } from "../../caregiver/entities/Caregiver.js";
+import { AppointmentStatus } from "../enums/AppointmentStatus.js";
+import { Address } from "../../address/entities/Address.js";
 
-@Entity({ name: "Appointments", schema: "public" })
+@Entity({ name: "APPOINTMENTS", schema: "public" })
 export class Appointment {
-  @PrimaryGeneratedColumn()
-  idAppointment!: number;
-  @Column({ type: "timestamp", nullable: false })
+  @PrimaryGeneratedColumn({ name: "ID" })
+  id!: number;
+  @Column({ name: "SCHEDULED_AT", type: "timestamp", nullable: false })
   scheduledAt!: Date;
-  @Column({ type: "int", nullable: false })
+  @Column({ name: "ID_PATIENT", type: "int", nullable: false })
   idPatient!: number;
-  @Column({ type: "int", nullable: false })
-  idCareProfessional!: number;
-  @Column({ type: "int", nullable: false })
+  @Column({ name: "ID_CAREGIVER", type: "int", nullable: false })
+  idCaregiver!: number;
+  @Column({ name: "ID_ADDRESS",type: "int", nullable: false })
   idAddress!: number;
   @Column({
+    name: "STATUS",
     type: "enum",
     enum: AppointmentStatus,
     default: AppointmentStatus.SCHEDULED,
     nullable: false,
   })
   status!: AppointmentStatus;
-  @CreateDateColumn()
+  @CreateDateColumn({name: "CREATED_AT"})
   createdAt!: Date;
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "UPDATED_AT" })
   updatedAt!: Date;
 
-  @ManyToOne(() => Patient, (patient) => patient.appointments)
-  @JoinColumn({ name: "idPatient" })
-  patient: any;
+  @ManyToOne(() => Patient, {onDelete: "CASCADE"})
+  @JoinColumn({ name: "ID_PATIENT" })
+  patient!: Patient;
 
-  @ManyToOne(() => CareProfessional)
-  @JoinColumn({ name: "idCareProfessional" })
-  careProfessional!: CareProfessional;
+  @ManyToOne(() => Caregiver, {onDelete: "CASCADE"})
+  @JoinColumn({ name: "ID_CAREGIVER" })
+  caregiver!: Caregiver;
 
   @ManyToOne(() => Address, (address) => address.appointments, {
     nullable: false,
   })
-  @JoinColumn({ name: "idAddress" })
+  @JoinColumn({ name: "ID_ADDRESS" })
   address!: Address;
 }

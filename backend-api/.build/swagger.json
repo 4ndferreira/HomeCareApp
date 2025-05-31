@@ -10,7 +10,8 @@
 			"GetUserResponse": {
 				"properties": {
 					"id": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"name": {
 						"type": "string"
@@ -25,7 +26,8 @@
 						"type": "string"
 					},
 					"urlImage": {
-						"type": "string"
+						"type": "string",
+						"nullable": true
 					},
 					"isPatient": {
 						"type": "boolean"
@@ -37,7 +39,6 @@
 					"email",
 					"phoneNumber",
 					"cpf",
-					"urlImage",
 					"isPatient"
 				],
 				"type": "object",
@@ -99,9 +100,10 @@
 						"format": "double"
 					},
 					"comment": {
-						"type": "string"
+						"type": "string",
+						"nullable": true
 					},
-					"idCareProfessional": {
+					"idCaregiver": {
 						"type": "number",
 						"format": "double"
 					},
@@ -129,8 +131,7 @@
 				"required": [
 					"id",
 					"rating",
-					"comment",
-					"idCareProfessional",
+					"idCaregiver",
 					"patient"
 				],
 				"type": "object",
@@ -145,7 +146,7 @@
 					"comment": {
 						"type": "string"
 					},
-					"idCareProfessional": {
+					"idCaregiver": {
 						"type": "number",
 						"format": "double"
 					},
@@ -157,7 +158,7 @@
 				"required": [
 					"rating",
 					"comment",
-					"idCareProfessional",
+					"idCaregiver",
 					"idPatient"
 				],
 				"type": "object",
@@ -169,24 +170,21 @@
 						"type": "number",
 						"format": "double"
 					},
-					"idUser": {
-						"type": "number",
-						"format": "double"
-					},
-					"patientName": {
+					"name": {
 						"type": "string"
 					},
-					"patientCpf": {
+					"cpf": {
 						"type": "string"
 					},
-					"patientBirthDate": {
+					"birthDate": {
 						"type": "string",
 						"format": "date-time"
 					},
 					"user": {
 						"properties": {
 							"urlImage": {
-								"type": "string"
+								"type": "string",
+								"nullable": true
 							},
 							"name": {
 								"type": "string"
@@ -197,7 +195,6 @@
 							}
 						},
 						"required": [
-							"urlImage",
 							"name",
 							"id"
 						],
@@ -206,10 +203,9 @@
 				},
 				"required": [
 					"id",
-					"idUser",
-					"patientName",
-					"patientCpf",
-					"patientBirthDate",
+					"name",
+					"cpf",
+					"birthDate",
 					"user"
 				],
 				"type": "object",
@@ -221,36 +217,36 @@
 						"type": "number",
 						"format": "double"
 					},
-					"patientName": {
+					"name": {
 						"type": "string"
 					},
-					"patientCpf": {
+					"cpf": {
 						"type": "string"
 					},
-					"patientBirthDate": {
+					"birthDate": {
 						"type": "string",
 						"format": "date-time"
 					}
 				},
 				"required": [
 					"idUser",
-					"patientName",
-					"patientCpf",
-					"patientBirthDate"
+					"name",
+					"cpf",
+					"birthDate"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"GetCareProfessionalResponse": {
+			"GetCaregiverResponse": {
 				"properties": {
 					"id": {
 						"type": "number",
 						"format": "double"
 					},
-					"professionalRegistryCode": {
+					"corenNumber": {
 						"type": "string"
 					},
-					"professionalBiography": {
+					"biography": {
 						"type": "string"
 					},
 					"rating": {
@@ -280,23 +276,23 @@
 				},
 				"required": [
 					"id",
-					"professionalRegistryCode",
-					"professionalBiography",
+					"corenNumber",
+					"biography",
 					"user"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"CareProfessionalRequest": {
+			"CaregiverRequest": {
 				"properties": {
 					"idUser": {
 						"type": "number",
 						"format": "double"
 					},
-					"professionalRegistryCode": {
+					"corenNumber": {
 						"type": "string"
 					},
-					"professionalBiography": {
+					"biography": {
 						"type": "string"
 					},
 					"rating": {
@@ -306,8 +302,8 @@
 				},
 				"required": [
 					"idUser",
-					"professionalRegistryCode",
-					"professionalBiography"
+					"corenNumber",
+					"biography"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -340,63 +336,32 @@
 							},
 							"name": {
 								"type": "string"
-							},
-							"id": {
-								"type": "number",
-								"format": "double"
 							}
 						},
 						"required": [
 							"phoneNumber",
-							"name",
-							"id"
+							"name"
 						],
 						"type": "object"
 					},
-					"careProfessional": {
+					"caregiver": {
 						"properties": {
 							"phoneNumber": {
 								"type": "string"
 							},
 							"name": {
 								"type": "string"
-							},
-							"id": {
-								"type": "number",
-								"format": "double"
 							}
 						},
 						"required": [
 							"phoneNumber",
-							"name",
-							"id"
+							"name"
 						],
 						"type": "object"
 					},
 					"address": {
 						"properties": {
-							"country": {
-								"type": "string"
-							},
-							"postalCode": {
-								"type": "string"
-							},
-							"state": {
-								"type": "string"
-							},
-							"city": {
-								"type": "string"
-							},
-							"neighborhood": {
-								"type": "string"
-							},
-							"complement": {
-								"type": "string"
-							},
-							"number": {
-								"type": "string"
-							},
-							"street": {
+							"alias": {
 								"type": "string"
 							},
 							"id": {
@@ -405,13 +370,7 @@
 							}
 						},
 						"required": [
-							"country",
-							"postalCode",
-							"state",
-							"city",
-							"neighborhood",
-							"number",
-							"street",
+							"alias",
 							"id"
 						],
 						"type": "object"
@@ -422,7 +381,7 @@
 					"scheduledAt",
 					"status",
 					"patient",
-					"careProfessional",
+					"caregiver",
 					"address"
 				],
 				"type": "object",
@@ -438,7 +397,7 @@
 						"type": "number",
 						"format": "double"
 					},
-					"idCareProfessional": {
+					"idCaregiver": {
 						"type": "number",
 						"format": "double"
 					},
@@ -450,7 +409,7 @@
 				"required": [
 					"scheduledAt",
 					"idPatient",
-					"idCareProfessional",
+					"idCaregiver",
 					"idAddress"
 				],
 				"type": "object",
@@ -491,7 +450,8 @@
 						"type": "string"
 					},
 					"complement": {
-						"type": "string"
+						"type": "string",
+						"nullable": true
 					},
 					"neighborhood": {
 						"type": "string"
@@ -572,8 +532,9 @@
 		}
 	},
 	"info": {
-		"title": "backend",
+		"title": "homecare-backend-api",
 		"version": "1.0.0",
+		"description": "API para o sistema de agendamento de atendimentos HomeCareApp",
 		"license": {
 			"name": "ISC"
 		},
@@ -684,7 +645,11 @@
 				"tags": [
 					"Users"
 				],
-				"security": [],
+				"security": [
+					{
+						"firebase": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -718,7 +683,11 @@
 				"tags": [
 					"Users"
 				],
-				"security": [],
+				"security": [
+					{
+						"firebase": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -732,7 +701,7 @@
 				]
 			}
 		},
-		"/users/firebase": {
+		"/users/firebase-user": {
 			"get": {
 				"operationId": "GetUserByFirebaseUid",
 				"responses": {
@@ -786,7 +755,7 @@
 					{
 						"description": "Filtra pelo ID do cuidador (Somente um filtro deve ser usado por consulta)",
 						"in": "query",
-						"name": "idCareProfessional",
+						"name": "idCaregiver",
 						"required": false,
 						"schema": {
 							"format": "double",
@@ -1049,30 +1018,6 @@
 						}
 					}
 				}
-			},
-			"delete": {
-				"operationId": "DeletePatient",
-				"responses": {
-					"204": {
-						"description": "No content"
-					}
-				},
-				"summary": "Remove o resgistro de um paciente da base",
-				"tags": [
-					"Patients"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
 			}
 		},
 		"/patients/user/{idUser}": {
@@ -1118,7 +1063,7 @@
 							"application/json": {
 								"schema": {
 									"items": {
-										"$ref": "#/components/schemas/GetCareProfessionalResponse"
+										"$ref": "#/components/schemas/GetCaregiverResponse"
 									},
 									"type": "array"
 								}
@@ -1128,7 +1073,7 @@
 				},
 				"summary": "Busca a lista de todos os cuidadores da base",
 				"tags": [
-					"CareProfessionals"
+					"Caregivers"
 				],
 				"security": [],
 				"parameters": []
@@ -1149,7 +1094,7 @@
 				},
 				"summary": "Cria um novo cadastro de cuidador na base",
 				"tags": [
-					"CareProfessionals"
+					"Caregivers"
 				],
 				"security": [],
 				"parameters": [],
@@ -1158,7 +1103,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/CareProfessionalRequest"
+								"$ref": "#/components/schemas/CaregiverRequest"
 							}
 						}
 					}
@@ -1174,7 +1119,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetCareProfessionalResponse"
+									"$ref": "#/components/schemas/GetCaregiverResponse"
 								}
 							}
 						}
@@ -1182,7 +1127,7 @@
 				},
 				"summary": "Busca um cuidador específico pelo seu ID",
 				"tags": [
-					"CareProfessionals"
+					"Caregivers"
 				],
 				"security": [],
 				"parameters": [
@@ -1206,7 +1151,7 @@
 				},
 				"summary": "Atualiza o cadastro de cuidador na base",
 				"tags": [
-					"CareProfessionals"
+					"Caregivers"
 				],
 				"security": [],
 				"parameters": [
@@ -1225,35 +1170,11 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/CareProfessionalRequest"
+								"$ref": "#/components/schemas/CaregiverRequest"
 							}
 						}
 					}
 				}
-			},
-			"delete": {
-				"operationId": "DeleteCareProfessinal",
-				"responses": {
-					"204": {
-						"description": "No content"
-					}
-				},
-				"summary": "Remove o resgistro de um paciente da base",
-				"tags": [
-					"CareProfessionals"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
 			}
 		},
 		"/care-professionals/user/{idUser}": {
@@ -1265,7 +1186,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetCareProfessionalResponse"
+									"$ref": "#/components/schemas/GetCaregiverResponse"
 								}
 							}
 						}
@@ -1273,7 +1194,7 @@
 				},
 				"summary": "Busca um cuidador específico pelo ID do usuário associado",
 				"tags": [
-					"CareProfessionals"
+					"Caregivers"
 				],
 				"security": [],
 				"parameters": [
@@ -1315,7 +1236,7 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "idCareProfessional",
+						"name": "idCaregiver",
 						"required": false,
 						"schema": {
 							"format": "double",

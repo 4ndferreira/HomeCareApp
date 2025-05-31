@@ -10,8 +10,10 @@ process.on('unhandledRejection', (reason, promise) => {
 
 import { createServer } from 'http';
 import debugLib from 'debug';
-import app from '../src/app';
-import { AppDataSource } from '../src/database/data-source';
+import app from './app.js';
+import { AppDataSource } from './database/data-source.js';
+import { DataSource } from 'typeorm';
+import { container } from 'tsyringe';
 
 const debug = debugLib('backend:server');
 
@@ -28,6 +30,7 @@ AppDataSource.initialize()
   .then(() => {
     console.log('✅ Data Source initialized');
 
+    container.registerInstance(DataSource, AppDataSource);
     /**
      * Create HTTP server.
      */

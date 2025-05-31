@@ -1,33 +1,25 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { Patient } from "../../patient/entities/Patient";
-import { CareProfessional } from "../../careProfessional/entities/CareProfessional";
 
-@Entity({ name: "Users", schema: "public" })
+@Entity({ name: "USERS", schema: "public" })
 export class User {
-  @PrimaryGeneratedColumn()
-  idUser!: number;
-  @Column({ type: "varchar", unique: true })
+  @PrimaryGeneratedColumn({ name: "ID" })
+  id!: number;
+  @Column({ name: "FIREBASE_UID", type: "char", length: 28, nullable: false, unique: true })
   firebaseUid!: string;
-  @Column({ type: "varchar", length: 150, nullable: false })
+  @Column({ name: "NAME", type: "varchar", length: 150, nullable: false })
   name!: string;
-  @Column({ type: "varchar", length: 150, nullable: false })
+  @Column({ name: "EMAIL", type: "varchar", length: 150, nullable: false })
   email!: string;
-  @Column({ type: "varchar", length: 15, nullable: false })
+  @Column({ name: "PHONE_NUMBER",type: "varchar", length: 15, nullable: false })
   phoneNumber!: string;
-  @Column({ type: "varchar", length: 11, nullable: false })
-  cpf!: string
-  @Column({ type: "varchar", nullable: true, length: 150 })
-  urlImage?: string | null
-  @Column({ type: "boolean", nullable: false })
-  isPatient!: boolean
-  @CreateDateColumn()
+  @Column({ name: "CPF", type: "varchar", length: 11, nullable: false })
+  cpf!: string;
+  @Column({ name: "URL_IMAGE", type: "varchar", nullable: true, length: 150 })
+  urlImage?: string | null;
+  @Column({ name: "IS_PATIENT", type: "boolean", nullable: false })
+  isPatient!: boolean;
+  @CreateDateColumn({name: "CREATED_AT"})
   createdAt!: Date;
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "UPDATED_AT" })
   updatedAt!: Date;
-
-  @OneToOne(() => Patient, (patient) => patient.user)
-  patient?: Patient;
-
-  @OneToOne(() => CareProfessional, (careProfessional) => careProfessional.user)
-  careProfessional?: CareProfessional;
-};
+}

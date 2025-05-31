@@ -1,15 +1,32 @@
 {
-  "name": "backend",
+  "name": "homecare-backend-api",
   "version": "0.0.0",
   "private": true,
-  "description": "",
+  "description": "API para o sistema de agendamento de atendimentos HomeCareApp",
   "license": "ISC",
   "author": "",
-  "main": ".eslintrc.js",
+  "main": "src/server.ts",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=11.0.0"
+  },
+  "type": "module",
   "scripts": {
-    "start": "node --no-warnings=ExperimentalWarning --import tsx bin/www.ts",
-    "tsoa:gen": "tsoa routes && tsoa spec",
-    "dev": "tsx watch bin/www.ts"
+    "start": "node --no-warnings=ExperimentalWarning dist/src/server.js",
+    "build": "tsc",
+    "tsoa:gen": "tsoa routes && tsoa spec && node fix-imports.cjs",
+    "dev": "tsx watch src/server.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [
+    "homecare",
+    "healthcare",
+    "api"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/4ndferreira/HomeCareApp.git"
   },
   "dependencies": {
     "class-transformer": "^0.5.1",
@@ -22,30 +39,28 @@
     "firebase-admin": "^13.4.0",
     "http-errors": "~1.6.3",
     "install": "^0.13.0",
-    "jade": "^0.29.0",
     "morgan": "~1.9.1",
     "npm": "^10.9.0",
     "pg": "^8.16.0",
     "reflect-metadata": "^0.2.2",
-    "sequelize": "^6.37.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "tsyringe": "^4.10.0",
     "typeorm": "^0.3.24"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.18",
+    "@types/debug": "^4.1.12",
     "@types/express": "^5.0.2",
     "@types/http-errors": "^2.0.4",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.15.18",
+    "@types/node": "^22.15.29",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "eslint": "^9.14.0",
     "globals": "^15.12.0",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "tsoa": "^6.6.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"

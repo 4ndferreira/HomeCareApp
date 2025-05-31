@@ -1,6 +1,6 @@
 export interface ReviewRequest {
   rating: number;
   comment: string;
-  idCareProfessional: number;
+  idCaregiver: number;
   idPatient: number;
 }

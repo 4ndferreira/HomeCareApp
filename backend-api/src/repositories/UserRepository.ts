@@ -1,36 +1,15 @@
-import { DataSource, Repository } from "typeorm";
-import { User } from "../models/user/entities/User";
+import { DataSource } from "typeorm";
+import { User } from "../models/user/entities/User.js";
+import { singleton } from "tsyringe";
+import { BaseRepository } from "./BaseRepository.js";
 
-export class UserRepository {
-  private repo: Repository<User>;
-
+@singleton()
+export class UserRepository extends BaseRepository<User> {
   constructor(dataSource: DataSource) {
-    this.repo = dataSource.getRepository(User);
-  }
-
-  findAll() {
-    return this.repo.find();
-  }
-
-  findById(id: number) {
-    return this.repo.findOneBy({ idUser: id });
+    super(dataSource, User);
   }
  
-  findByFirebaseUid(uid: string) {
-    return this.repo.findOneBy({ firebaseUid: uid });
-  }
-
-  create(userData: Partial<User>) {
-    const user = this.repo.create(userData);
-    return this.repo.save(user);
-  }
-
-  async update(id: number, userData: Partial<User>) {
-    await this.repo.update(id, userData);
-    return this.findById(id);
-  }
-
-  delete(id: number) {
-    return this.repo.delete(id);
+  async findByFirebaseUid(uid: string): Promise<User | null> {
+    return await this.repo.findOneBy({ firebaseUid: uid });
   }
 }

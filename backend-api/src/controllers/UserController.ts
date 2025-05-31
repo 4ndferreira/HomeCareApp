@@ -1,37 +1,24 @@
 import { Body, Controller, Get, Path, Post, Put, Delete, Route, Tags, SuccessResponse, Security, Request } from "tsoa";
-import { UserService } from "../services/UserService";
-import { UserRepository } from "../repositories/UserRepository";
-import { AppDataSource } from "../database/data-source";
-import { UserRequest } from "../models/user/dtos/UserRequest";
-import { GetUserResponse } from "../models/user/dtos/GetUserResponse";
+import { UserService } from "../services/UserService.js";
+import { UserRequest } from "../models/user/dtos/UserRequest.js";
+import { GetUserResponse } from "../models/user/dtos/GetUserResponse.js";
 import { Request as ExRequest } from "express";
-import { CreateResponse } from "../models/shared/CreateResponse";
+import { CreateResponse } from "../models/shared/CreateResponse.js";
+import { injectable } from "tsyringe";
 
-const userRepository = new UserRepository(AppDataSource);
-const userService = new UserService(userRepository);
-
-function toGetUserResponse(user: any): GetUserResponse {
-  return {
-    id: user.idUser,
-    name: user.name,
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    cpf: user.cpf,
-    urlImage: user.urlImage ?? null,
-    isPatient: user.isPatient,
-  };
-}
+@injectable()
 @Route("users")
 @Tags("Users")
 export class UserController extends Controller {
+  constructor(private userService: UserService) { super() }
   /**
    * @summary Retorna todos os usuários cadastrados
    * @returns Lista de usuários e seus dados
    */
   @Get("/")
   public async getAllUsers(): Promise<GetUserResponse[]> {
-    const users = await userService.getAllUsers();
-    return users.map(toGetUserResponse);
+    const users = await this.userService.getAllUsers();
+    return users;
   }
   /**
    * @summary Busca um usuário pelo seu ID
@@ -43,19 +30,19 @@ export class UserController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid user id: ${id}`);
     }
-    const user = await userService.getUserById(id);
+    const user = await this.userService.getUserById(id);
     if (!user) {
       this.setStatus(404);
       throw new Error("User not found in database.");
     }
-    return toGetUserResponse(user);
+    return user;
   }
   /**
    * @summary Busca um usuário pelo firebase UID dele
    * @returns Dados do usuário
    */
   @Security("firebase")
-  @Get("/firebase")
+  @Get("/firebase-user")
   public async getUserByFirebaseUid(
     @Request() req: ExRequest
   ): Promise<GetUserResponse> {
@@ -66,12 +53,12 @@ export class UserController extends Controller {
       throw new Error("Invalid or missing Firebase UID.");
     }
 
-    const user = await userService.getByFirebaseUid(firebaseUid);
+    const user = await this.userService.getByFirebaseUid(firebaseUid);
     if (!user) {
       this.setStatus(404);
       throw new Error("User not found in database.");
     }
-    return toGetUserResponse(user);
+    return user;
   }
   /**
    * @summary Cria um novo usuário
@@ -89,14 +76,15 @@ export class UserController extends Controller {
       this.setStatus(401);
       throw new Error("Invalid or missing Firebase UID.");
     }
-    const user = await userService.createUser(firebaseUid, userData);
+    const user = await this.userService.createUser(firebaseUid, userData);
     this.setStatus(201);
-    return { id: user.idUser };
+    return { id: user.id };
   }
   /**
    * @summary Altera os dados de um usuário
    * @returns Usuário alterado com sucesso
    */
+  @Security("firebase")
   @Put("/{id}")
   public async updateUser(
     @Path() id: number,
@@ -106,7 +94,7 @@ export class UserController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid user id: ${id}`);
     }
-    const updated = await userService.updateUser(id, userData);
+    const updated = await this.userService.updateUser(id, userData);
     if (!updated) {
       this.setStatus(404);
       throw new Error(`There is no user associated with id ${id}.`);
@@ -117,6 +105,7 @@ export class UserController extends Controller {
    * @summary Remove o registro de um usuário da base
    * @returns Usuário removido com sucesso
    */
+  @Security("firebase")
   @Delete("/{id}")
   public async deleteUser(@Path() id: number): Promise<void> {
     if (isNaN(id)) {
@@ -124,10 +113,10 @@ export class UserController extends Controller {
       throw new Error(`Invalid user id: ${id}`);
     }
 
-    const result = await userService.deleteUser(id);
-    if (!result.affected) {
+    const deleted = await this.userService.deleteUser(id);
+    if (!deleted) {
       this.setStatus(404);
-      throw new Error("User not found");
+      throw new Error(`There is no user associated with id ${id}.`);
     }
     this.setStatus(204);
   }

@@ -1,51 +1,25 @@
-import {
-  Controller,
-  Route,
-  Tags,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Path,
-  Body,
-  SuccessResponse,
-  Response as TsoaResponse,
-} from "tsoa";
+import { Controller, Route, Tags, Get, Post, Put, Delete, Path, Body, SuccessResponse, Response as TsoaResponse } from "tsoa";
+import { AddressService } from "../services/AddressService.js";
+import { GetAddressResponse } from "../models/address/dtos/GetAddressResponse.js";
+import { AddressRequest } from "../models/address/dtos/AddressRequest.js";
+import { CreateResponse } from "../models/shared/CreateResponse.js";
+import { injectable } from "tsyringe";
 
-import { AddressService } from "../services/AddressService";
-import { AddressRepository } from "../repositories/AddressRepository";
-import { AppDataSource } from "../database/data-source";
-import { GetAddressResponse } from "../models/address/dtos/GetAddressResponse";
-import { AddressRequest } from "../models/address/dtos/AddressRequest";
-import { CreateResponse } from "../models/shared/CreateResponse";
-
-const addressRepository = new AddressRepository(AppDataSource);
-const addressService = new AddressService(addressRepository);
-
-function toGeResponse(entity: any): GetAddressResponse {
-  return {
-    id: entity.idAddress,
-    street: entity.street,
-    number: entity.number,
-    complement: entity.complement ?? null,
-    neighborhood: entity.neighborhood,
-    city: entity.city,
-    state: entity.state,
-    postalCode: entity.postalCode,
-    country: entity.country,
-  };
-}
+@injectable()
 @Route("addresses")
 @Tags("Addresses")
 export class AddressController extends Controller {
+  constructor(private addressService: AddressService) {
+    super()
+  }
   /**
    * @summary Busca por todos os endereços cadastrados na base
    * @returns Retorna todos os endereços e seus dados
    */
   @Get("/")
   public async getAllAddresses(): Promise<GetAddressResponse[]> {
-    const addresses = await addressService.getAll();
-    return addresses.map(toGeResponse);
+    const addresses = await this.addressService.getAllAddresses();
+    return addresses;
   }
   /**
    * @summary Busca por um endereço pelo seu ID
@@ -58,13 +32,13 @@ export class AddressController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid address id: ${id}`);
     }
-    const address = await addressService.getById(id);
+    const address = await this.addressService.getAddressById(id);
     if (!address) {
       this.setStatus(404);
       throw new Error("Address not found");
     }
 
-    return toGeResponse(address);
+    return address;
   }
   /**
    * @summary Cria um novo endereço
@@ -73,9 +47,9 @@ export class AddressController extends Controller {
   @SuccessResponse("201", "Created")
   @Post("/")
   public async createAddress(@Body() data: AddressRequest): Promise<CreateResponse> {
-    const newAddress = await addressService.create(data);
+    const newAddress = await this.addressService.createAddress(data);
     this.setStatus(201);
-    return { id: newAddress.idAddress };
+    return { id: newAddress.id };
   }
   /**
    * @summary Atualiza um endereço pelo ID
@@ -91,7 +65,7 @@ export class AddressController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid address id: ${id}`);
     }
-    const updated = await addressService.update(id, data);
+    const updated = await this.addressService.updateAddress(id, data);
     if (!updated) {
       this.setStatus(404);
       throw new Error(`There is no address associated with id ${id}.`);
@@ -110,7 +84,7 @@ export class AddressController extends Controller {
       throw new Error(`Invalid user id: ${id}`);
     }
 
-    const deleted = await addressService.delete(id);
+    const deleted = await this.addressService.deleteAddress(id);
     if (!deleted) {
       this.setStatus(404);
       throw new Error(`There is no address associated with id ${id}.`);

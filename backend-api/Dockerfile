@@ -1,20 +1,21 @@
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
 RUN apk add --no-cache python3 make g++
 
-COPY package.json package-lock.json ./
+COPY package.json yarn.lock ./
 
-RUN npm ci
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN npm run tsoa:gen
+RUN yarn run tsoa:gen
+RUN yarn run build
 
 ENV NODE_ENV=production
 ENV PORT=5000
 
 EXPOSE 5000
 
-CMD ["node", "--no-warnings=ExperimentalWarning", "--import", "tsx", "bin/www.ts"]
+CMD ["node", "--no-warnings=ExperimentalWarning", "dist/src/server.js"]

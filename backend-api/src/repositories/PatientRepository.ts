@@ -1,36 +1,17 @@
-import { DataSource, Repository } from "typeorm";
-import { Patient } from "../models/patient/entities/Patient";
+import { DataSource, FindOneOptions } from "typeorm";
+import { Patient } from "../models/patient/entities/Patient.js";
+import { singleton } from "tsyringe";
+import { BaseRepository } from "./BaseRepository.js";
 
-export class PatientRepository {
-  private repo: Repository<Patient>;
-
+@singleton()
+export class PatientRepository extends BaseRepository<Patient> {
   constructor(dataSource: DataSource) {
-    this.repo = dataSource.getRepository(Patient);
+    super(dataSource, Patient);
   }
 
-  findAll() {
-    return this.repo.find();
-  }
-
-  findById(id: number) {
-    return this.repo.findOneBy({ idPatient: id });
-  }
-
-  findByUserId(idUser: number) {
-    return this.repo.findOneBy({ idUser: idUser });
-  }
-
-  create(patientData: Partial<Patient>) {
-    const patient = this.repo.create(patientData);
-    return this.repo.save(patient);
-  }
-
-  async update(id: number, patientData: Partial<Patient>) {
-    await this.repo.update(id, patientData);
-    return this.findById(id);
-  }
-
-  delete(id: number) {
-    return this.repo.delete(id);
+  async findByUserId(
+    options: FindOneOptions<Patient>
+  ): Promise<Patient | null> {
+    return await this.repo.findOne(options);
   }
 }

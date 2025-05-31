@@ -1,29 +1,25 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, UpdateDateColumn, CreateDateColumn, OneToMany } from "typeorm";
-import { User } from "../../user/entities/User";
-import { Appointment } from "../../appointment/entities/Appointment";
+import { User } from "../../user/entities/User.js";
 
 
-@Entity({ name: "Patients", schema: "public" })
+@Entity({ name: "PATIENTS", schema: "public" })
 export class Patient {
-  @PrimaryGeneratedColumn()
-  idPatient!: number;
-  @Column({ type: "int", nullable: false })
+  @PrimaryGeneratedColumn({ name: "ID" })
+  id!: number;
+  @Column({ name: "ID_USER", type: "int", nullable: false })
   idUser!: number;
-  @Column({ type: "varchar", nullable: false })
-  patientName!: string;
-  @Column({ type: "varchar", nullable: false, unique: true })
-  patientCpf!: string;
-  @Column({ type: "date", nullable: false })
-  patientBirthDate!: Date;
-  @CreateDateColumn()
+  @Column({ name: "NAME", type: "varchar", length: 150, nullable: false })
+  name!: string;
+  @Column({ name: "CPF", type: "varchar", length: 11, nullable: false, unique: true })
+  cpf!: string;
+  @Column({ name: "BIRTH_DATE", type: "date", nullable: false })
+  birthDate!: Date;
+  @CreateDateColumn({name: "CREATED_AT"})
   createdAt!: Date;
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "UPDATED_AT" })
   updatedAt!: Date;
 
-  @OneToOne(() => User, (user) => user.patient)
-  @JoinColumn({ name: "idUser" })
+  @OneToOne(() => User)
+  @JoinColumn({ name: "ID_USER" })
   user!: User;
-
-  @OneToMany(() => Appointment, (appointment) => appointment.patient)
-  appointments!: Appointment[];
 }

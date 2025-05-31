@@ -1,55 +1,31 @@
 import {Controller, Get, Route, Post, Body, Put, Delete, Path, Tags, Query,} from "tsoa";
-import { AppDataSource } from "../database/data-source";
-import { ReviewRepository } from "../repositories/ReviewRepository";
-import { ReviewService } from "../services/ReviewService";
-import { PatientRepository } from "../repositories/PatientRepository";
-import { UserRepository } from "../repositories/UserRepository";
-import { GetReviewResponse } from "../models/review/dtos/GetReviewResponse";
-import { ReviewRequest } from "../models/review/dtos/ReviewRequest";
-import { CreateResponse } from "../models/shared/CreateResponse";
-import { DetailedReview } from "../models/review/dtos/DetailedReview";
+import { ReviewService } from "../services/ReviewService.js";
+import { GetReviewResponse } from "../models/review/dtos/GetReviewResponse.js";
+import { ReviewRequest } from "../models/review/dtos/ReviewRequest.js";
+import { CreateResponse } from "../models/shared/CreateResponse.js";
+import { injectable } from "tsyringe";
 
-const reviewRepository = new ReviewRepository(AppDataSource);
-const patientRepository = new PatientRepository(AppDataSource);
-const userRepository = new UserRepository(AppDataSource);
-const reviewService = new ReviewService(
-  reviewRepository,
-  patientRepository,
-  userRepository
-);
-
-function toGetReviewResponse(review: DetailedReview): GetReviewResponse {
-  return {
-    id: review.idReview,
-    rating: review.rating,
-    comment: review.comment!,
-    idCareProfessional: review.idCareProfessional,
-    patient: {
-      id: review.patient.id,
-      name: review.patient.name,
-      urlImage: review.patient.urlImage
-    }
-  };
-}
+@injectable()
 @Route("reviews")
 @Tags("Reviews")
 export class ReviewController extends Controller {
+  constructor(private reviewService: ReviewService) { super() }
   /**
    * @summary Busca a lista de as avaliações na base
-   * @param idCareProfessional Filtra pelo ID do cuidador (Somente um filtro deve ser usado por consulta)
+   * @param idCaregiver Filtra pelo ID do cuidador (Somente um filtro deve ser usado por consulta)
    * @param idCarePatient Filtra pelo ID do paciente
    * @returns Lista de todas as avaliações
    */
   @Get("/")
   public async getAll(
-    @Query() idCareProfessional?: number,
+    @Query() idCaregiver?: number,
     @Query() idPatient?: number
   ): Promise<GetReviewResponse[]> {
-    if (idCareProfessional && idPatient)
+    if (idCaregiver && idPatient)
       throw new Error("Only one filter should be used per consultation.");
 
-    const reviews = await reviewService.getAll(idCareProfessional, idPatient);
-    return reviews.map(toGetReviewResponse);
+    const reviews = await this.reviewService.getAll(idCaregiver, idPatient);
+    return reviews;
   }
   /**
    * @summary Busca de uma avaliação pelo seu ID
@@ -61,12 +37,12 @@ export class ReviewController extends Controller {
       this.setStatus(400);
       throw new Error(`Invalid review id: ${id}`);
     }
-    const review = await reviewService.getById(id);
+    const review = await this.reviewService.getById(id);
     if (!review) {
       this.setStatus(404);
       throw new Error("Review not found.");
     }
-    return toGetReviewResponse(review);
+    return review;
   }
   /**
    * @summary Cria uma nova avaliação
@@ -74,9 +50,9 @@ export class ReviewController extends Controller {
    */
   @Post("/")
   public async create(@Body() data: ReviewRequest): Promise<CreateResponse> {
-    const newReview = await reviewService.create(data);
+    const newReview = await this.reviewService.create(data);
     this.setStatus(201);
-    return { id: newReview.idReview };
+    return { id: newReview.id };
   }
   /**
    * @summary Atualiza uma avaliação
@@ -91,7 +67,7 @@ export class ReviewController extends Controller {
       throw new Error(`Invalid review id: ${id}`);
     }
 
-    const updated = await reviewService.update(id, data);
+    const updated = await this.reviewService.update(id, data);
     if (!updated) {
       this.setStatus(404);
       throw new Error(`There is no review associated with id ${id}.`);
@@ -108,7 +84,7 @@ export class ReviewController extends Controller {
       throw new Error(`Invalid review id: ${id}`);
     }
 
-    const deleted = await reviewService.delete(id);
+    const deleted = await this.reviewService.delete(id);
     if (!deleted) {
       this.setStatus(404);
       throw new Error(`There is no review associated with id ${id}.`);
