@@ -7,7 +7,7 @@ import { CreateResponse } from "../models/shared/CreateResponse.js";
 import { injectable } from "tsyringe";
 
 @injectable()
-@Route("care-professionals")
+@Route("caregivers")
 @Tags("Caregivers")
 export class CaregiverController extends Controller {
   constructor(

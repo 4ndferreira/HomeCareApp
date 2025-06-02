@@ -24,3 +24,8 @@
 
 # TypeScript
 **/*.tsbuildinfo
+
+
+frontend-original
+frontend-mobile
+frontend-next

@@ -1,0 +1,12 @@
+import type { HTMLProps } from 'react';
+import styles from './{{name}}.module.scss';
+
+interface {{pascalCase name}}Props extends HTMLProps<{{type}}>: {
+  //tipagem das props a serem definidas
+};
+
+export default function {{pascalCase name}}({ ...prop }: {{pascalCase name}}Props) {
+  return (
+    <{{tag}} className={styles.Root} { ...prop }></{{tag}}>
+  );
+}
